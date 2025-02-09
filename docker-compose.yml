@@ -1,0 +1,33 @@
+services:
+  app:
+    build: ./bot
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    volumes:
+        - ./bot:/app
+        # Use an anonymous volume for node_modules to avoid overwriting container-installed modules.
+        - /app/node_modules
+    env_file:
+        - ./.env
+    environment:
+      # Ensure the DATABASE_URL is set for Prisma (adjust credentials as needed)
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/smhbot"
+      NODE_ENV: "development"
+      ADMIN_CHAT_ID: "339585806"
+  db:
+    image: postgres:14
+    # restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: smhbot
+    ports:
+      - "5432:5432"
+    volumes:
+          - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

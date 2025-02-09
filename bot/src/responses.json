@@ -1,0 +1,79 @@
+{
+  "addOrderType": {
+    "promptName": "📝 Please enter the name for the new order type:",
+    "invalidName": "⚠️ Invalid input. Please enter a valid name:",
+    "promptBasePrice": "💰 Please enter the base price for this order type (e.g., 99.99):",
+    "invalidPrice": "⚠️ Invalid price. Please enter a valid number for the base price:",
+    "confirmation": "You're about to create a new order type:\n\nName: *{name}*\nBase Price: *{basePrice}*\n\nDo you confirm?",
+    "confirmButton": "✅ Confirm",
+    "cancelButton": "❌ Cancel",
+    "unableToDetermineTelegramId": "Unable to determine your Telegram ID.",
+    "unauthorized": "🚫 You are not authorized to add order types.",
+    "creationSuccess": "✅ Order type *{name}* created successfully with ID: {id}",
+    "creationError": "❌ There was an error creating the order type.",
+    "cancelled": "❌ Operation cancelled."
+  },
+  "modifyOrderType": {
+    "noOrderTypes": "No order types available.",
+    "selectPrompt": "Select an order type to modify:",
+    "details": "Order Type Details:\nID: {id}\nName: {name}\nBase Price: {basePrice}",
+    "editName": "Edit Name",
+    "editPrice": "Edit Base Price",
+    "cancel": "Cancel",
+    "promptNewName": "Please enter the new name:",
+    "promptNewPrice": "Please enter the new base price (number):",
+    "invalidNumber": "Invalid number. Operation cancelled.",
+    "updateSuccess": "✅ Order type updated successfully!",
+    "updateError": "❌ There was an error updating the order type.",
+    "invalidSelection": "Please select an order type using the inline buttons."
+  },
+  "removeOrderType": {
+    "noOrderTypes": "No order types available.",
+    "selectPrompt": "Select an order type to remove:",
+    "details": "Order Type Details:\nID: {id}\nName: {name}\nBase Price: {basePrice}",
+    "confirmRemove": "Remove",
+    "cancel": "Cancel",
+    "removeSuccess": "✅ Order type removed successfully.",
+    "removeError": "❌ There was an error removing the order type."
+  },
+  "listOrderTypes": {
+    "noOrderTypes": "No order types available.",
+    "header": "Order Types:\n",
+    "line": "ID: {id}, Name: {name}, Base Price: {basePrice}\n"
+  },
+  "start": {
+    "welcome": "Welcome to the Bot Service!\n\nCommands:\n/new_order - Create a new order\n/menu - Show main menu"
+  },
+  "menu": {
+    "menuText": "📋 Menu:",
+    "newOrder": "📄 New Order",
+    "addOrderType": "➕ Add Order Type",
+    "modifyOrderType": "✏️ Modify Order Type",
+    "removeOrderType": "🗑 Remove Order Type"
+  },
+  "newOrder": {
+    "selectOrderType": "Please select the type of work:",
+    "orderTypeButton": "{name} (Base: {basePrice})",
+    "promptTopic": "📝 Enter the topic of the work:",
+    "invalidTopic": "⚠️ Invalid topic. Operation cancelled.",
+    "promptDeadline": "📅 Enter the deadline (YYYY-MM-DD):",
+    "invalidDeadline": "⚠️ Invalid deadline. Operation cancelled.",
+    "promptPages": "📄 Enter the number of pages:",
+    "invalidPages": "⚠️ Invalid number of pages. Operation cancelled.",
+    "promptComments": "💬 Enter additional comments (or type '-' to skip):",
+    "promptAttachments": "📎 Now send your file attachments one by one. When finished, type 'done'.",
+    "attachmentReceived": "Attachment received. Send more or type 'done' when finished.",
+    "attachmentInvalid": "⚠️ Please attach a file or type 'done' if finished.",
+    "summary": "Order Summary:\n\nType: {orderType}\nTopic: {topic}\nDeadline: {deadline}\nPages: {pages}\nComments: {comments}\nAttachments: {attachments}",
+    "confirmButton": "✅ Confirm",
+    "cancelButton": "❌ Cancel",
+    "orderSent": "Your order has been sent to the administrator.",
+    "orderCreationError": "❌ There was an error creating your order.",
+    "orderCancelled": "Order creation cancelled.",
+    "attachmentCaption": "New Order:\nWork Type: {orderType}\nTopic: {topic}\nFrom: {username}"
+  },
+  "global": {
+    "noOrderTypes": "No order types are available at this time.",
+    "invalidSelection": "⚠️ Please select an option using the inline buttons."
+  }
+}

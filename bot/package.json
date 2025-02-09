@@ -1,0 +1,22 @@
+{
+  "name": "bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/bot.js",
+    "dev": "npx prisma generate && npx nodemon src/bot.js",
+    "prisma": "prisma"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "prisma": "^6.3.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.3.0",
+    "nodemon": "^3.1.9",
+    "telegraf": "^4.16.3"
+  }
+}

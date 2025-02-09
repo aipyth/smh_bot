@@ -1,0 +1,51 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int         @id @default(autoincrement())
+  telegramId        String      @unique
+  username          String?
+  isAdmin           Boolean     @default(false)
+  orders            Order[]
+  createdOrderTypes OrderType[] @relation("CreatedOrderTypes")
+}
+
+model OrderType {
+  id          Int     @id @default(autoincrement())
+  name        String
+  basePrice   Decimal @db.Decimal(10, 2)
+  // The administrator who created the order type
+  createdBy   User    @relation("CreatedOrderTypes", fields: [createdById], references: [id])
+  createdById Int
+  orders      Order[]
+}
+
+model Order {
+  id                  Int          @id @default(autoincrement())
+  topic               String
+  deadline            String
+  specialRequirements String?
+  // The price for this order, which might be corrected later by the administrator.
+  price               Decimal      @db.Decimal(10, 2)
+  orderTypeName       String       @default("")
+  // Relations:
+  orderType           OrderType?   @relation(fields: [orderTypeId], references: [id], onDelete: SetNull)
+  orderTypeId         Int?
+  user                User         @relation(fields: [userId], references: [id])
+  userId              Int
+  attachments         Attachment[]
+}
+
+model Attachment {
+  id      Int    @id @default(autoincrement())
+  url     String
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId Int
+}
