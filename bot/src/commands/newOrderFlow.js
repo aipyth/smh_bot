@@ -86,6 +86,35 @@ const newOrderFlow = new Scenes.WizardScene(
     }
     ctx.scene.state.comments = comments;
     ctx.scene.state.attachments = [];
+
+
+    // Check is user has username and ask for phone number if needed
+    if (ctx.from.username) {
+      // User has a username; skip phone number step.
+      ctx.scene.state.phone = "Not provided";
+      await ctx.reply(responses.newOrder.promptAttachments,
+        Markup.inlineKeyboard([
+          [Markup.button.callback(responses.newOrder.finishAttachmentsButton, "finish_attachments")]
+        ]),
+      );
+      console.log(`have usernem skipping from ${ctx.wizard.cursor} to ${ctx.wizard.cursor + 2}`)
+      return ctx.wizard.selectStep(ctx.wizard.cursor + 2);
+    } else {
+      // Ask for phone number.
+      await ctx.reply(responses.newOrder.promptPhone);
+      return ctx.wizard.next();
+    }
+
+  },
+  // Step 7 (optional) Collect user's phone number
+  async (ctx) => {
+    console.log(`getting phone number on step ${ctx.wizard.cursor}`)
+    if (!ctx.message || !ctx.message.text) {
+      await ctx.reply(responses.newOrder.invalidPhone);
+      return;
+    }
+    ctx.scene.state.phone = ctx.message.text;
+
     await ctx.reply(responses.newOrder.promptAttachments,
       Markup.inlineKeyboard([
         [Markup.button.callback(responses.newOrder.finishAttachmentsButton, "finish_attachments")]
@@ -93,9 +122,10 @@ const newOrderFlow = new Scenes.WizardScene(
     );
     return ctx.wizard.next();
   },
-  // Step 7: Collect attachments until user clicks button to finish.
+  // Step 8: Collect attachments until user clicks button to finish. Ask for phone number (optional)
   // This step loops until the user presses a button to finish.
   async (ctx) => {
+    console.log(`collecting attachments on step ${ctx.wizard.cursor}`)
     // Check if the update is a callback query for finishing attachments.
     if (ctx.update.callback_query && ctx.update.callback_query.data === "finish_attachments") {
       await ctx.answerCbQuery(); // Acknowledge the button press.
@@ -151,8 +181,9 @@ const newOrderFlow = new Scenes.WizardScene(
     }
     await ctx.reply(responses.newOrder.attachmentInvalid);
   },
-  // Step 8: Process confirmation, create order, and forward details plus attachments with captions.
+  // Step 10: Process confirmation, create order, and forward details plus attachments with captions.
   async (ctx) => {
+    console.log(`confirming information on step ${ctx.wizard.cursor}`)
     if (ctx.update.callback_query) {
       await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
       const action = ctx.update.callback_query.data;
@@ -192,7 +223,7 @@ const newOrderFlow = new Scenes.WizardScene(
           const displayName = ctx.from.username || ctx.from.first_name || "Unknown";
           // Build the admin message with the user link.
           const adminMessage = formatMessage(
-            "New Order Received:\n\nType: {orderType}\nTopic: {topic}\nDeadline: {deadline}\nPages: {pages}\nComments: {comments}\nUser: [{displayName}]({userLink})",
+            "New Order Received:\n\nType: {orderType}\nTopic: {topic}\nDeadline: {deadline}\nPages: {pages}\nComments: {comments}\nPhone: {phone}\nUser: [{displayName}]({userLink})",
             {
               orderType: ctx.scene.state.orderTypeName,
               topic: ctx.scene.state.topic,
@@ -200,7 +231,8 @@ const newOrderFlow = new Scenes.WizardScene(
               pages: ctx.scene.state.pages,
               comments: ctx.scene.state.comments || "Немає",
               userLink: userLink,
-              displayName: displayName
+              displayName: displayName,
+              phone: ctx.scene.state.phone || "Not provided"
             }
           );
           const adminChatId = process.env.ADMIN_CHAT_ID;
