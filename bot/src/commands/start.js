@@ -1,5 +1,5 @@
-const prisma = require('../prisma');
-const responses = require('../responses.json');
+const prisma = require("../prisma");
+const responses = require("../responses.json");
 
 async function startCommand(ctx) {
   const telegramId = ctx.from && ctx.from.id.toString();
@@ -9,9 +9,9 @@ async function startCommand(ctx) {
       user = await prisma.user.create({
         data: {
           telegramId,
-          username: ctx.from.username || '',
-          isAdmin: false
-        }
+          username: ctx.from.username || "",
+          isAdmin: false,
+        },
       });
     }
   }

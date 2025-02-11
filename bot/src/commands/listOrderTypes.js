@@ -1,8 +1,8 @@
-const prisma = require('../prisma');
-const responses = require('../responses.json');
+const prisma = require("../prisma");
+const responses = require("../responses.json");
 
 function formatMessage(template, params) {
-  return template.replace(/{(\w+)}/g, (_, key) => params[key] || '');
+  return template.replace(/{(\w+)}/g, (_, key) => params[key] || "");
 }
 
 async function listOrderTypesCommand(ctx) {
@@ -16,7 +16,7 @@ async function listOrderTypesCommand(ctx) {
     message += formatMessage(responses.listOrderTypes.line, {
       id: ot.id,
       name: ot.name,
-      basePrice: ot.basePrice.toFixed(2)
+      basePrice: ot.basePrice.toFixed(2),
     });
   });
   await ctx.reply(message);
