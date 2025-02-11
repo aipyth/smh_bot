@@ -1,4 +1,6 @@
 #!/bin/sh
+# Run prisma client generation
+npx prisma generate
 # Run Prisma migrations (if any) before starting the bot.
 npx prisma migrate deploy
 
