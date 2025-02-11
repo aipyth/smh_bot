@@ -212,22 +212,23 @@ const newOrderFlow = new Scenes.WizardScene(
           const displayName = ctx.from.username || ctx.from.first_name || "Unknown";
           // Build the admin message with the user link.
           const adminMessage = formatMessage(
-            "New Order Received:\n\nType: {orderType}\nTopic: {topic}\nDeadline: {deadline}\nPages: {pages}\nComments: {comments}\nUser: <a href='{userLink}'>{displayName}</a>",
+            "New Order Received:\n\nType: {orderType}\nTopic: {topic}\nDeadline: {deadline}\nPages: {pages}\nComments: {comments}\nUser: [{displayName}]({userLink})",
             {
               orderType: ctx.scene.state.orderTypeName,
               topic: ctx.scene.state.topic,
               deadline: ctx.scene.state.deadline,
               pages: ctx.scene.state.pages,
-              comments: ctx.scene.state.comments || "None",
+              comments: ctx.scene.state.comments || "Немає",
               userLink: userLink,
               displayName: displayName
             }
           );
           const adminChatId = process.env.ADMIN_CHAT_ID;
           if (adminChatId) {
+            console.log(`Sending new order to chat id ${adminChatId}`)
             // Send the admin message using HTML parse mode.
             await ctx.telegram.sendMessage(adminChatId, adminMessage, {
-              parse_mode: 'HTML'
+              parse_mode: 'Markdown'
             });
             // Forward each attachment with the caption.
             for (const att of ctx.scene.state.attachments) {

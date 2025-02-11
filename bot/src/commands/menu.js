@@ -15,11 +15,10 @@ async function menuCommand(ctx) {
     [Markup.button.callback(responses.menu.newOrder, 'new_order')]
   ];
   if (isAdmin) {
-    buttons.push([
-      Markup.button.callback(responses.menu.addOrderType, 'add_order_type'),
-      Markup.button.callback(responses.menu.modifyOrderType, 'modify_order_type'),
-      Markup.button.callback(responses.menu.removeOrderType, 'remove_order_type')
-    ]);
+
+    buttons.push([Markup.button.callback(responses.menu.addOrderType, 'add_order_type')]);
+    buttons.push([Markup.button.callback(responses.menu.modifyOrderType, 'modify_order_type')]);
+    buttons.push([Markup.button.callback(responses.menu.removeOrderType, 'remove_order_type')]);
   }
   await ctx.reply(responses.menu.menuText, Markup.inlineKeyboard(buttons));
 }
