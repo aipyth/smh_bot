@@ -86,14 +86,19 @@ const newOrderFlow = new Scenes.WizardScene(
     }
     ctx.scene.state.comments = comments;
     ctx.scene.state.attachments = [];
-    await ctx.reply(responses.newOrder.promptAttachments);
+    await ctx.reply(responses.newOrder.promptAttachments,
+      Markup.inlineKeyboard([
+        [Markup.button.callback(responses.newOrder.finishAttachmentsButton, "finish_attachments")]
+      ]),
+    );
     return ctx.wizard.next();
   },
-  // Step 7: Collect attachments until user types "done".
-  // This step loops until the user sends a message with text "done".
+  // Step 7: Collect attachments until user clicks button to finish.
+  // This step loops until the user presses a button to finish.
   async (ctx) => {
-    const text = ctx.message && ctx.message.text;
-    if (text && text.toLowerCase() === "done") {
+    // Check if the update is a callback query for finishing attachments.
+    if (ctx.update.callback_query && ctx.update.callback_query.data === "finish_attachments") {
+      await ctx.answerCbQuery(); // Acknowledge the button press.
       // Proceed to summary.
       const attachmentsText = ctx.scene.state.attachments.length > 0
         ? ctx.scene.state.attachments
@@ -105,13 +110,13 @@ const newOrderFlow = new Scenes.WizardScene(
             })
           )
           .join("\n")
-        : "None";
+        : "Немає";
       const summary = formatMessage(responses.newOrder.summary, {
         orderType: ctx.scene.state.orderTypeName,
         topic: ctx.scene.state.topic,
         deadline: ctx.scene.state.deadline,
         pages: ctx.scene.state.pages,
-        comments: ctx.scene.state.comments || "None",
+        comments: ctx.scene.state.comments || "Немає",
         attachments: attachmentsText
       });
       await ctx.reply(summary, {
@@ -134,44 +139,19 @@ const newOrderFlow = new Scenes.WizardScene(
       }
       if (attachment) {
         ctx.scene.state.attachments.push(attachment);
-        // Inform the user to continue or type "done".
-        await ctx.reply(responses.newOrder.attachmentReceived);
+        // After receiving an attachment, send a reply with an inline button to finish attachments.
+        await ctx.reply(
+          responses.newOrder.attachmentReceived,
+          Markup.inlineKeyboard([
+            [Markup.button.callback(responses.newOrder.finishAttachmentsButton, "finish_attachments")]
+          ])
+        );
         return; // Stay in the same step.
       }
     }
     await ctx.reply(responses.newOrder.attachmentInvalid);
   },
-  // Step 8: Show summary for confirmation.
-  // async (ctx) => {
-  //   const attachmentsText = ctx.scene.state.attachments.length > 0
-  //     ? ctx.scene.state.attachments
-  //       .map((att, i) =>
-  //         formatMessage("Attachment {num}: [{type}] {fileId}", {
-  //           num: i + 1,
-  //           type: att.type,
-  //           fileId: att.fileId
-  //         })
-  //       )
-  //       .join("\n")
-  //     : "None";
-  //   const summary = formatMessage(responses.newOrder.summary, {
-  //     orderType: ctx.scene.state.orderTypeName,
-  //     topic: ctx.scene.state.topic,
-  //     deadline: ctx.scene.state.deadline,
-  //     pages: ctx.scene.state.pages,
-  //     comments: ctx.scene.state.comments || "None",
-  //     attachments: attachmentsText
-  //   });
-  //   await ctx.reply(summary, {
-  //     parse_mode: 'Markdown',
-  //     ...Markup.inlineKeyboard([
-  //       [Markup.button.callback(responses.newOrder.confirmButton, 'order_confirm')],
-  //       [Markup.button.callback(responses.newOrder.cancelButton, 'order_cancel')]
-  //     ])
-  //   });
-  //   return ctx.wizard.next();
-  // },
-  // Step 9: Process confirmation, create order, and forward details plus attachments with captions.
+  // Step 8: Process confirmation, create order, and forward details plus attachments with captions.
   async (ctx) => {
     if (ctx.update.callback_query) {
       await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
