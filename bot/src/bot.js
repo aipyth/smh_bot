@@ -118,5 +118,7 @@ bot.action('remove_order_type', async (ctx) => {
   ctx.scene.enter('remove-order-type-wizard');
 });
 
-bot.launch();
-console.log(responses.start.welcome);
+bot.launch(async () => {
+  const botInfo = bot.botInfo;
+  console.log(`Running bot ${botInfo?.first_name} @${botInfo?.username}...`)
+});
