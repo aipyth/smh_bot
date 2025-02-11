@@ -41,5 +41,5 @@ jobs:
 
             # 4) Move back up and run docker-compose with production file
             cd ..
-            docker-compose -f docker-compose.production.yml pull
-            docker-compose -f docker-compose.production.yml up -d --build
+            docker compose -f docker-compose.production.yml pull
+            docker compose -f docker-compose.production.yml up -d --build
