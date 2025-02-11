@@ -1,6 +1,7 @@
 const { Markup, Scenes } = require("telegraf");
 const prisma = require("../prisma");
 const responses = require("../responses.json");
+const withCommandExit = require("../withCommandExit");
 
 // Helper to format templates with placeholders.
 function formatMessage(template, params) {
@@ -31,7 +32,7 @@ const newOrderFlow = new Scenes.WizardScene(
     return ctx.wizard.next();
   },
   // Step 2: Process order type selection and then prompt for topic.
-  async (ctx) => {
+  withCommandExit(async (ctx) => {
     if (
       ctx.update.callback_query &&
       ctx.update.callback_query.data.startsWith("orderType_")
@@ -50,14 +51,19 @@ const newOrderFlow = new Scenes.WizardScene(
       }
       ctx.scene.state.orderTypeName = orderType.name;
       ctx.scene.state.orderTypeBasePrice = orderType.basePrice;
+      await ctx.editMessageText(
+        formatMessage(responses.newOrder.orderTypeSelected, {
+          orderType: ctx.scene.state.orderTypeName,
+        }),
+      );
       // Prompt for topic.
       await ctx.reply(responses.newOrder.promptTopic);
       return ctx.wizard.next();
     }
     await ctx.reply(responses.global.invalidSelection);
-  },
+  }),
   // Step 3: Capture topic and prompt for deadline.
-  async (ctx) => {
+  withCommandExit(async (ctx) => {
     if (!ctx.message || !ctx.message.text) {
       await ctx.reply(responses.newOrder.invalidTopic);
       return ctx.scene.leave();
@@ -65,9 +71,9 @@ const newOrderFlow = new Scenes.WizardScene(
     ctx.scene.state.topic = ctx.message.text;
     await ctx.reply(responses.newOrder.promptDeadline);
     return ctx.wizard.next();
-  },
+  }),
   // Step 4: Capture deadline and prompt for number of pages.
-  async (ctx) => {
+  withCommandExit(async (ctx) => {
     if (!ctx.message || !ctx.message.text) {
       await ctx.reply(responses.newOrder.invalidDeadline);
       return ctx.scene.leave();
@@ -75,9 +81,9 @@ const newOrderFlow = new Scenes.WizardScene(
     ctx.scene.state.deadline = ctx.message.text;
     await ctx.reply(responses.newOrder.promptPages);
     return ctx.wizard.next();
-  },
+  }),
   // Step 5: Capture number of pages and prompt for additional comments.
-  async (ctx) => {
+  withCommandExit(async (ctx) => {
     const pages = parseInt(ctx.message && ctx.message.text);
     if (isNaN(pages)) {
       await ctx.reply(responses.newOrder.invalidPages);
@@ -86,9 +92,9 @@ const newOrderFlow = new Scenes.WizardScene(
     ctx.scene.state.pages = pages;
     await ctx.reply(responses.newOrder.promptComments);
     return ctx.wizard.next();
-  },
+  }),
   // Step 6: Capture comments and prompt for file attachments.
-  async (ctx) => {
+  withCommandExit(async (ctx) => {
     let comments = ctx.message && ctx.message.text;
     if (!comments || comments.trim() === "-") {
       comments = "";
@@ -119,9 +125,9 @@ const newOrderFlow = new Scenes.WizardScene(
     // Ask for phone number.
     await ctx.reply(responses.newOrder.promptPhone);
     return ctx.wizard.next();
-  },
+  }),
   // Step 7 (optional) Collect user's phone number
-  async (ctx) => {
+  withCommandExit(async (ctx) => {
     console.log(`getting phone number on step ${ctx.wizard.cursor}`);
     if (!ctx.message || !ctx.message.text) {
       await ctx.reply(responses.newOrder.invalidPhone);
@@ -141,10 +147,10 @@ const newOrderFlow = new Scenes.WizardScene(
       ]),
     );
     return ctx.wizard.next();
-  },
+  }),
   // Step 8: Collect attachments until user clicks button to finish. Ask for phone number (optional)
   // This step loops until the user presses a button to finish.
-  async (ctx) => {
+  withCommandExit(async (ctx) => {
     console.log(`collecting attachments on step ${ctx.wizard.cursor}`);
     // Check if the update is a callback query for finishing attachments.
     if (
@@ -222,9 +228,9 @@ const newOrderFlow = new Scenes.WizardScene(
       }
     }
     await ctx.reply(responses.newOrder.attachmentInvalid);
-  },
+  }),
   // Step 10: Process confirmation, create order, and forward details plus attachments with captions.
-  async (ctx) => {
+  withCommandExit(async (ctx) => {
     console.log(`confirming information on step ${ctx.wizard.cursor}`);
     if (ctx.update.callback_query) {
       await ctx.editMessageReplyMarkup({ inline_keyboard: [] });
@@ -310,7 +316,7 @@ const newOrderFlow = new Scenes.WizardScene(
         return ctx.scene.leave();
       }
     }
-  },
+  }),
 );
 
 module.exports = { newOrderFlow };
