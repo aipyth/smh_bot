@@ -16,7 +16,7 @@ services:
       # Ensure the DATABASE_URL is set for Prisma (adjust credentials as needed)
       DATABASE_URL: "postgresql://postgres:postgres@db:5432/smhbot"
       NODE_ENV: "development"
-      ADMIN_CHAT_ID: "339585806"
+      # ADMIN_CHAT_ID: "339585806"
   db:
     image: postgres:14
     # restart: always
