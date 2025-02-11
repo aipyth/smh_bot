@@ -1,0 +1,45 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ "deploy" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "."
+          target: "~/smhbot"
+
+      - name: SSH into the server and configure .env
+        uses: appleboy/ssh-action@v0.1.16
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # 1) Move into project directory
+            cd ~/smhbot
+
+            # 2) Create the top-level .env
+            echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
+            echo "ADMIN_CHAT_ID=${{ secrets.ADMIN_CHAT_ID }}" >> .env
+
+            # 3) Create the .env inside the bot/ folder
+            cd bot
+            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" > .env
+
+            # 4) Move back up and run docker-compose with production file
+            cd ..
+            docker-compose -f docker-compose.production.yml pull
+            docker-compose -f docker-compose.production.yml up -d --build
